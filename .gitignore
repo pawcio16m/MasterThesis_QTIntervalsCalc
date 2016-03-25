@@ -1,0 +1,14 @@
+# untracked folders with data
+ptbdb/
+
+# untracked folder with toolbox
+wfdb-app-toolbox-0-9-9/
+
+# untacked .dat files
+*.dat
+
+# untracked .hea files
+*.hea
+
+# untracked .asv files
+*.asv
