@@ -12,3 +12,6 @@ wfdb-app-toolbox-0-9-9/
 
 # untracked .asv files
 *.asv
+
+# untracked temp .odt files
+.~lock.MasterThesis.odt#
