@@ -1,7 +1,31 @@
 %clear command window and workspace 
-% clear
+
+clear
 close all
 clc
+
+
+%reading signal from file PTB database from Physionet.org
+
+[time,signal] = rdsamp('ptbdb/patient002/s0015lre.hea');
+
+
+%Global variables
+
+drainNumber = 1;
+Fc_Hp = 3;  %Hz
+Fc_Lp = 40; %Hz
+Fs = 1000;  %Hz
+numberOfSamples = 100000;
+Lp = myfilterdesign(1,Fs,Fc_Lp,30,'Blackman');
+
+
+%signal operation
+
+signalFromOneDrain = signal(:,drainNumber);
+signalSample = signalFromOneDrain(1:numberOfSamples);
+timeSample = time(1:numberOfSamples);
+
 
 %filepath for patient 
 % patientNumber = 150;
@@ -15,44 +39,55 @@ clc
 %     [time,signal,Fs] = rdsamp(datFiles(i).name);   
 % end
 
-% [time,signal] = rdsamp('102.hea');
-% signal_V5 = signal(:,1);
-% signal_V2 = signal(:,2);
 
-numberOfSamples = 5000;
-signal_sample = signal_V5(1:numberOfSamples);
-tm_samp = time(1:numberOfSamples);
-Fs = 360;
+%show raw signal
+figure(1);
+plot(timeSample,signalSample);
+title('Raw signal');
+xlabel('time [s]');
+ylabel('Amplitude');
+
 
 %filtering
-Fc_lp = 40;
-Fc_hp = 5;
 
-%Lp, Hp - lowpass and highpass coefficiants
-Lp = myfilterdesign(1,Fs,Fc_lp,30,'Blackman');
-Hp = myfilterdesign(2,Fs,Fc_hp,7,'Prostokatne');
+%High-pass filtering - IIR Butterworth 1st. order, Fc = 3 Hz 
 
-sig_filt = myfilter(signal_sample,Lp);
+[B,A] = butter(1,3/(Fs/2),'high');    
+signalFiltered = filter(B,A,signalSample);
+figure(2);
+plot(timeSample,signalFiltered);
+title('Signal after high-pass filter');
+xlabel('time [s]');
+ylabel('Amplitude');
 
-figure(1)
-subplot(311)
-plot(tm_samp,signal_sample);
-title('Raw signal without filter');
+%Low-pass filtering - Blackman window, Fc = 40 Hz
+
+signalFiltered = myfilter(signalFiltered,Lp);
+figure(3);
+plot(timeSample,signalFiltered);
+title('Signal after low-pass filter');
 xlabel('time [s]');
 ylabel('Amplitude');
 
 
-subplot(312)
-plot(tm_samp,sig_filt);
-title(sprintf('Signal with lowpass filter Fc %d  Hz',Fc_lp));
+%PanTompkins algorithm
+[WaveAmpl,R_index,delay] = pan_tompkin(signalFiltered,Fs,0);
+figure(4);
+plot(timeSample,signalFiltered,'b',timeSample(R_index),signalFiltered(R_index),'xr');
+title(sprintf('Signal with QRS detection'));
 xlabel('time [s]');
 ylabel('Amplitude');
+legend('signal','R-peak');
 
-sig_filt = myfilter(sig_filt,Hp);
+%QRS_Onset detection
 
-subplot(313)
-plot(tm_samp,sig_filt);
-title(sprintf('Signal with highpass filter Fc %d  Hz',Fc_hp));
-xlabel('time [s]');
-ylabel('Amplitude');
+%T_End detection
+
+%QT_calculation
+
+
+%QT interval statistics
+
+
+
 
