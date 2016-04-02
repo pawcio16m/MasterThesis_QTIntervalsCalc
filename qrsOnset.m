@@ -54,11 +54,24 @@ function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
         coeff = polyfit(xfit,yfit,1);        
         qrs_onset = round(-coeff(2)/coeff(1));
         %find the nearest local minimum to calculated value
-        temp = find(loc<qrs_onset);
-        %chcek if this minium is correct - not to far from calculated value
-        if(qrs_onset - loc(temp(end)) > round(0.04*Fs))
-            qrs_onset = loc(temp(end));
+        tempQRS = qrs_onset;   
+        counterexceed = 0;
+        while(signal(tempQRS) > signal(tempQRS - 1))
+            tempQRS = tempQRS - 1;
+            if(qrs_onset - tempQRS > round(0.06*Fs))
+                counterexceed = 1;
+                break;
+            end
         end
+        if(counterexceed == 0)
+            qrs_onset = tempQRS;
+        end            
+                
+%         temp = find(loc<qrs_onset);
+%         %chcek if this minium is correct - not to far from calculated value
+%         if(qrs_onset - loc(temp(end)) > round(0.04*Fs))
+%             qrs_onset = loc(temp(end));
+%         end
         QRS_Onset(i-1) = qrs_onset;
     end
     qrsOnsetIndex = QRS_Onset;
