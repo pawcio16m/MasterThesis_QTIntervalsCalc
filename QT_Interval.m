@@ -1,5 +1,5 @@
-function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientNumber, draw)
-%function [ signalFiltered , R_index, QRS_Onset] = qrsOnset( patientNumber, plot )
+function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Interval(patientNumber, draw)
+%function [ signalFiltered , R_index, QRS_Onset, QRS_End_out] = QT_Interval( patientNumber, plot )
 %The function execute whole program
 %
 %Inputs:
@@ -8,8 +8,10 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
 %
 %Outputs:
 %   - signalFiltered - lowpass and highpass filtering aplyied
-%   - QRS_Onset - matrix (1xN) with QRS Onset indexes
-%   - R_index- matrix (1xN) with new R Peak indexes
+%   - R_index_out- matrix (1xN) with new R Peak indexes
+%   - QRS_Onset_out - matrix (1xN) with QRS Onset indexes
+%   - QRS_End_out - matrix (1xN) with QRS End indexes
+
   
 
     %clear command window and workspace 
@@ -71,6 +73,8 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
     %filtering
 
     display(sprintf('Signal filtering highpass Butterworth filter with Fc = %d Hz and lowpass FIR filter with Blackman window Fc = %d Hz',Fc_Hp,Fc_Lp));
+    
+    
     %High-pass filtering - IIR Butterworth 1st. order, Fc = 3 Hz 
 
     [B,A] = butter(filterOrder,Fc_Hp/(Fs/2),'high');    
@@ -82,7 +86,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
         xlabel('time [s]');
         ylabel('Amplitude');
         legend('Signal');
-    end
+    end  
   
 
     %Low-pass filtering - Blackman window, Fc = 40 Hz
@@ -103,7 +107,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
 
     display('Pan Tompkins algorithm to find QRS complex and R peaks');
     tic
-    [WaveAmpl,R_index,delay] = pan_tompkin(signalFiltered,Fs,0);
+    [~,R_index,~] = pan_tompkin(signalFiltered,Fs,0);
     toc
     display(sprintf('%d R peaks detected in signal',length(R_index)));
     if(draw == 1)
@@ -117,7 +121,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
  
 
 
-    %QRS_Onset detection
+    %QRS_Onset detection and R_Peak correction
 
     display('QRS Onset finder algorithm');
     tic
@@ -131,11 +135,47 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
         ylabel('Amplitude');
         legend('Signal','R-Peak','QRS Onset');
     end
+    
+    
+    %QRS_End detection
   
+    display('QRS End finder algorithm');
+    tic
+    [QRS_End] = qrsEnd(signalFiltered,newR_Peak);
+    toc
+    if(draw == 1)
+        figure()
+        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_End),signalFiltered(QRS_End),'og');
+        title('Signal with new R peaks detection and QRS End');
+        xlabel('time [s]');
+        ylabel('Amplitude');
+        legend('Signal','R-Peak','QRS End');
+    end
+    
+    
+    %T_Max detection
+    
+    display('T Max finder algorithm');
+    
 
     %T_End detection
+    
+    display('T End finder algorithm');
 
 
+    %Draw all points on one plot
+    
+     display('Draw a plot with all detected points');
+     if(draw == 1)
+        figure()
+        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy');
+        title('Signal with R peaks detection QRS Onset and QRS End');
+        xlabel('time [s]');
+        ylabel('Amplitude');
+        legend('Signal filtered','R-Peak','QRS Onset','QRS End');
+     end
+    
+    
     %QT_calculation
 
 
@@ -144,8 +184,9 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out] = QT_Interval(patientN
 
     %end 
     signalFiltered_out = signalFiltered;
-    R_index_out = R_index;
+    R_index_out = newR_Peak;
     QRS_Onset_out = QRS_Onset;
+    QRS_End_out = QRS_End;
     display('Program exited');
 
 end

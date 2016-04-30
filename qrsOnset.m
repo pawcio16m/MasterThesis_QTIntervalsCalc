@@ -38,10 +38,16 @@ function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
         rPeak = R_Peak(i) ;
         %correct R_Peak detection from pantompkins algorithm
         %make sure that R Peak is on increasing slope
-     
-        while(signal(rPeak+1)<signal(rPeak) && correction<maxDelay)
-            rPeak = rPeak-1;
-            correction = correction + 1;
+        if(signal(rPeak+1)<signal(rPeak))        
+            while(signal(rPeak+1)<signal(rPeak) && correction<maxDelay)
+                rPeak = rPeak-1;
+                correction = correction + 1;
+            end        
+        else
+            while(signal(rPeak+1)>signal(rPeak) && correction<maxDelay)
+                rPeak = rPeak+1;
+                correction = correction + 1;
+            end        
         end
         
         correction = 0;
