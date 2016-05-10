@@ -1,4 +1,4 @@
-function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Interval(patientNumber, draw)
+function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out] = QT_Interval(patientNumber, draw)
 %function [ signalFiltered , R_index, QRS_Onset, QRS_End_out] = QT_Interval( patientNumber, plot )
 %The function execute whole program
 %
@@ -11,6 +11,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
 %   - R_index_out- matrix (1xN) with new R Peak indexes
 %   - QRS_Onset_out - matrix (1xN) with QRS Onset indexes
 %   - QRS_End_out - matrix (1xN) with QRS End indexes
+%   - T_Max_out - matrix (1xN) with T wave max indexes
 
   
 
@@ -39,7 +40,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
     % [time,signal] = rdsamp('ptbdb/patient002/s0015lre.hea');
     %filepath for patient 
     display(sprintf('Load signal for patient %d from PTB database at Physionet.org',patientNumber));
-    filepath = strcat('ptbdb/patient',sprintf('%03d',patientNumber));
+    filepath = strcat('newptbdb/ptbdb/patient',sprintf('%03d',patientNumber));
     %choose first .dat file in the patient folder
     datFiles = dir(strcat(filepath,'/*.hea'));
     filepath = strcat(filepath,'/',datFiles(1).name);
@@ -102,7 +103,6 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
     end
  
 
-
     %PanTompkins algorithm
 
     display('Pan Tompkins algorithm to find QRS complex and R peaks');
@@ -120,21 +120,27 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
     end
  
 
-
     %QRS_Onset detection and R_Peak correction
 
     display('QRS Onset finder algorithm');
     tic
-    [QRS_Onset,newR_Peak] = qrsOnset(signalFiltered,1000,R_index);
+    [QRS_Onset,newR_Peak] = qrsOnset(signalFiltered,Fs,R_index);
     toc
     if(draw == 1)
         figure()
-        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og');
-        title('Signal with new R peaks detection and QRS Onset');
+        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or');
+        title('Signal with new R peaks correction');
         xlabel('time [s]');
         ylabel('Amplitude');
-        legend('Signal','R-Peak','QRS Onset');
+        legend('Signal','R-Peak');
+        figure()
+        plot(time,signalFiltered,'b',time(QRS_Onset),signalFiltered(QRS_Onset),'or');
+        title('Signal with QRS Onset indexes');
+        xlabel('time [s]');
+        ylabel('Amplitude');
+        legend('Signal','QRS Onset');
     end
+    display(sprintf('%d QRS Onset detected in signal',length(QRS_Onset)));
     
     
     %QRS_End detection
@@ -145,17 +151,34 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
     toc
     if(draw == 1)
         figure()
-        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_End),signalFiltered(QRS_End),'og');
-        title('Signal with new R peaks detection and QRS End');
+        plot(time,signalFiltered,'b',time(QRS_End),signalFiltered(QRS_End),'or');
+        title('Signal with QRS End indexes');
         xlabel('time [s]');
         ylabel('Amplitude');
-        legend('Signal','R-Peak','QRS End');
+        legend('Signal','QRS End');
     end
+    display(sprintf('%d QRS End detected in signal',length(QRS_End)));
     
     
     %T_Max detection
-    
+   
     display('T Max finder algorithm');
+    [T_Max, invert] = tMax(signalFiltered,QRS_End,Fs);    
+    if(invert == true)
+        display('T wave negative');        
+    else
+        display('T wave positive');
+    end
+    display(sprintf('%d T wave max detected in signal',length(T_Max)));
+    
+    if(draw == 1)
+        figure()
+        plot(time,signalFiltered,'b',time(T_Max),signalFiltered(T_Max),'or');
+        title('Signal with T wave maximum indexes');
+        xlabel('time [s]');
+        ylabel('Amplitude');
+        legend('Signal','T Max');
+    end
     
 
     %T_End detection
@@ -165,15 +188,15 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
 
     %Draw all points on one plot
     
-     display('Draw a plot with all detected points');
-     if(draw == 1)
-        figure()
-        plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy');
-        title('Signal with R peaks detection QRS Onset and QRS End');
-        xlabel('time [s]');
-        ylabel('Amplitude');
-        legend('Signal filtered','R-Peak','QRS Onset','QRS End');
-     end
+    display('Draw a plot with all detected points');
+    
+    figure()
+    plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy',time(T_Max),signalFiltered(T_Max),'ok');
+    title('Signal with R peaks detection QRS Onset and QRS End');
+    xlabel('time [s]');
+    ylabel('Amplitude');
+    legend('Signal filtered','R-Peak','QRS Onset','QRS End','T Max');
+    
     
     
     %QT_calculation
@@ -187,6 +210,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out] = QT_Inte
     R_index_out = newR_Peak;
     QRS_Onset_out = QRS_Onset;
     QRS_End_out = QRS_End;
+    T_Max_out = T_Max;
     display('Program exited');
 
 end
