@@ -5,6 +5,12 @@ newptbdb/
 # untracked folder with toolbox
 wfdb-app-toolbox-0-9-9/
 
+# untracked folder with images
+rys/
+
+# untracked .mat files
+*.mat
+
 # untacked .dat files
 *.dat
 
