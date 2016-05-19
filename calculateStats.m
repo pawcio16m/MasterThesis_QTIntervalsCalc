@@ -38,7 +38,7 @@ function [ Stats ] = calculateStats( qtInterval, fid)
         fprintf(fid,'StandardDeviation:\t %0.2f\t[ms]\n', Stats(i).StandardDeviation);
         fprintf(fid,'MinValue:\t\t\t %0.2f\t[ms]\n', Stats(i).MinValue);
         fprintf(fid,'MaxValue:\t\t\t %0.2f\t[ms]\n', Stats(i).MaxValue);
-        fprintf(fid,'Percentage450:\t\t %0.2f[ms]\n', Stats(i).Percentage450);
+        fprintf(fid,'Percentage450:\t\t %0.2f\n', Stats(i).Percentage450);
      
     end
     fprintf(fid,'--------------------------------------------\n\n');

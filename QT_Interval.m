@@ -146,7 +146,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     fprintf(fid,'R Peak detected:\t %0.2d\n',length(QRS_Onset));   
     fprintf(fid,'--------------------------------------------\n\n');
     fprintf(fid,'Additional information\n');
-     fprintf(fid,'--------------------------------------------\n');
+    fprintf(fid,'--------------------------------------------\n');
     fprintf(fid,'Signal filtering highpass Butterworth filter with Fc = %d Hz and lowpass FIR filter with Blackman window Fc = %d Hz\n',Fc_Hp,Fc_Lp);
     toc
     
