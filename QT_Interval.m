@@ -1,8 +1,10 @@
-function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(patientNumber, draw, formula)
-%function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(patientNumber, draw, formula)
+function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(time, signal, patientNumber, fileName, draw, formula)
+%function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(time, signal, patientNumber, fileName, draw, formula)
 %The function execute whole program
 %
 %Inputs:
+%   - time - signal duration
+%   - signal - ECG signal from patient
 %   - patientNumber - patient numberr from PTB database
 %   - draw - a flag to plot figures (1- plot, other no plot)
 %   - formula - choose formula to calculate QT interval ('Bazetta', 'Fridericia' or 'Framigham')
@@ -18,13 +20,11 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
 %   - Stats_out - struct (1x12) with QT interval statistic to all drains
 
 
-    %clear command window and workspace 
-    close all
-    clc
-    tstart = tic;        
-    fid = fopen(strcat('output\patient',sprintf('%03d',patientNumber),'_raport.txt'),'w+');     %open file to create a raport   
-    display('QT analysis program starts');
-    fprintf(fid,'Raport for patient %d\n\n',patientNumber);    
+    %create and open file to write raport 
+    tstart = tic;   
+    fileName = fileName(1:end-4);
+    fid = fopen(strcat('output\patient',sprintf('%03d',patientNumber),'_',fileName,'_raport.txt'),'w+');     %open file to create a raport       
+    fprintf(fid,'Raport for patient %d and filename %s\n\n',patientNumber,fileName);    
 
 
     %Global variables
@@ -32,31 +32,13 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     drainNumber = 1;
     Fc_Hp = 3;  %Hz
     Fc_Lp = 40; %Hz
-    Fs = 1000;  %Hz
-    Lp = myfilterdesign(1,Fs,Fc_Lp,30,'Blackman');
+    Fs = 1000;  %Hz   
     filterOrder = 1;
     fprintf(fid,'Parameters\n');
     fprintf(fid,'--------------------------------------------\n');
     fprintf(fid,'Fs:\t\t\t\t\t %d Hz\n',Fs);
     fprintf(fid,'Fc_Hp:\t\t\t\t %d Hz\n',Fc_Hp);
     fprintf(fid,'Fc_Lp:\t\t\t\t %d Hz\n',Fc_Lp);
-  
-    
-    %File reading
-    %filepath for patient 
-    tic
-    display(sprintf('Load signal for patient %d from PTB database at Physionet.org',patientNumber));   
-    filepath = strcat('newptbdb/ptbdb/patient',sprintf('%03d',patientNumber));
-    %choose first .dat file in the patient folder
-    datFiles = dir(strcat(filepath,'/*.hea'));
-    filepath = strcat(filepath,'/',datFiles(end).name);
-    [time,signal] = rdsamp(filepath); 
-    %choose all .dat files in the patient folder
-    % length(datFiles)
-    % for i=1:length(datFiles)
-    %     [time,signal,Fs] = rdsamp(datFiles(i).name);   
-    % end
-    toc
     
 
     %signal operation
@@ -81,28 +63,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     %filtering
     tic
     display(sprintf('Signal filtering highpass Butterworth filter with Fc = %d Hz and lowpass FIR filter with Blackman window Fc = %d Hz',Fc_Hp,Fc_Lp));   
-   
-    %High-pass filtering - IIR Butterworth 1st. order, Fc = 3 Hz 
-    [B,A] = butter(filterOrder,Fc_Hp/(Fs/2),'high');    
-    signalFiltered = filter(B,A,signalSample);
-    if(draw == 1)
-        figure();
-        plot(timeSample,signalFiltered);
-        title('Signal after high-pass filter');
-        xlabel('time [s]');
-        ylabel('Amplitude');
-        legend('Signal');
-    end  
-    %Low-pass filtering - Blackman window, Fc = 40 Hz
-    signalFiltered = myfilter(signalFiltered,Lp);
-    if(draw == 1)
-        figure();
-        plot(timeSample,signalFiltered);
-        title('Signal after low-pass filter');
-        xlabel('time [s]');
-        ylabel('Amplitude');
-        legend('Signal');
-    end
+    signalFiltered = filtering(signalSample,timeSample,filterOrder,Fc_Hp,Fc_Lp,Fs,draw);
     toc
     
 
@@ -191,7 +152,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     display('T End finder algorithm');    
     T_End = tEnd(signalFiltered,QRS_Onset,T_Max,Fs,type);    
     display(sprintf('%0.2f percentage of T wave end detected in signal',((length(T_End)-length(find(T_End==-1)))/length(T_End))*100));
-    fprintf(fid,'%0.2f percentage of T wave end detected in signal\n',((length(T_End)-length(find(T_End==-1)))/length(T_End))*100);
+    fprintf(fid,'%0.2f percentage of T wave end detected in signal\n',((length(T_End)-length(find(T_End==-1)))/length(T_End))*100); 
     if(draw == 1)
         figure()
         plot(time,signalFiltered,'b',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'or');
@@ -200,6 +161,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         ylabel('Amplitude');
         legend('Signal','T End');
     end
+    % T_End_local = tEndLocal(signal,QRS_Onset,T_Max,T_End,Fs,type)
     toc    
 
 
@@ -208,25 +170,22 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     display('Draw a plot with all detected points');    
     fig = figure();
     plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'ok');
-    title('Signal with R peaks detection QRS Onset and QRS End');
+    title(sprintf('Signal with QRS Complex and T End for patient %d file %s',patientNumber,fileName));
     xlabel('time [s]');
     ylabel('Amplitude');
     legend('Signal filtered','R-Peak','QRS Onset','QRS End','T End');
     display('Saving figure to file');
     tic
-    saveas(fig,strcat('output\patient',sprintf('%03d',patientNumber),'_plot.fig'));
+    saveas(fig,strcat('output\patient',sprintf('%03d',patientNumber),'_',fileName,'_plot.fig'));
     toc
     
     
     
     %QT_calculation
     
-    tic
-    display('Calculate QT intervals');
+    tic   
     QTinterval = qtCalculation(QRS_Onset, T_End, newR_Peak, Fs, formula);
-    QTinterval = QTinterval(QTinterval~=0);
-    QTInterval = {};
-    QTInterval{1} = QTinterval;
+    QTinterval = QTinterval(QTinterval~=0);   
     fprintf(fid,['Calculate QT interval according to ',formula,' formula\n']);
     fprintf(fid,'--------------------------------------------\n\n');
     toc
@@ -236,8 +195,24 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     
     tic
     display('Present QT interval statistics');
-    QT_Interval_statistic = calculateStats(QTInterval,fid);    
+    QT_Interval_statistic = calculateStats(QTinterval,fid,drainNumber);    
     toc   
+    
+    
+    %draw signal from all drains
+    
+%     for i=1:12        
+%         signal = signal(:,i);
+%         signalFiltered = filtering(signalSample,filterOrder,Fc_Hp,Fc_Lp,Fs,draw);
+%         figure();
+%         plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'ok');
+%         title('Signal with R peaks detection QRS Onset and QRS End');
+%         xlabel('time [s]');
+%         ylabel('Amplitude');
+%         legend('Signal filtered','R-Peak','QRS Onset','QRS End','T End');
+%         display('Saving figure to file');
+%     end
+        
     
 
     %end 
@@ -248,9 +223,8 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     QRS_End_out = QRS_End;
     T_Max_out = T_Max;
     T_End_out = T_End;
-    QT_Interval_out = QTInterval;
-    Stats_out = QT_Interval_statistic;        
-    display('Program exited');
+    QT_Interval_out = QTinterval;
+    Stats_out = QT_Interval_statistic;      
     telapsed = toc(tstart);
     display(sprintf('This analysis took %0.3f seconds',telapsed));
     fprintf(fid,'This analysis wad done on %s and took %0.3f seconds\n\n',datestr(now),telapsed);
