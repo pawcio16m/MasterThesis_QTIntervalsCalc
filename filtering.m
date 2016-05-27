@@ -25,7 +25,7 @@ function signalFiltered = filtering(signalSample,timeSample,filterOrder,Fc_Hp,Fc
         plot(timeSample,signalFiltered);
         title('Signal after high-pass filter');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal');
     end  
     %Low-pass filtering - Blackman window, Fc = 40 Hz
@@ -36,7 +36,7 @@ function signalFiltered = filtering(signalSample,timeSample,filterOrder,Fc_Hp,Fc
         plot(timeSample,signalFiltered);
         title('Signal after low-pass filter');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal');
     end
 

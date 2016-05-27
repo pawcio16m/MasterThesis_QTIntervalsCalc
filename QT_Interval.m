@@ -55,7 +55,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(timeSample,signalSample);
         title('Raw signal');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal');
     end
    
@@ -78,7 +78,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(timeSample,signalFiltered,'b',timeSample(R_index),signalFiltered(R_index),'xr');
         title('Signal with R peaks detection');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('signal','R-peak');
     end
     toc
@@ -94,13 +94,13 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or');
         title('Signal with new R peaks correction');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal','R-Peak');
         figure()
         plot(time,signalFiltered,'b',time(QRS_Onset),signalFiltered(QRS_Onset),'or');
         title('Signal with QRS Onset indexes');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal','QRS Onset');
     end
     display(sprintf('%d QRS Onset detected in signal',length(QRS_Onset)));
@@ -122,7 +122,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(time,signalFiltered,'b',time(QRS_End),signalFiltered(QRS_End),'or');
         title('Signal with QRS End indexes');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal','QRS End');
     end
     display(sprintf('%d QRS End detected in signal',length(QRS_End)));
@@ -140,7 +140,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(time,signalFiltered,'b',time(T_Max),signalFiltered(T_Max),'or');
         title('Signal with T wave maximum indexes');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal','T Max');
     end
     toc
@@ -158,7 +158,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         plot(time,signalFiltered,'b',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'or');
         title('Signal with T wave end indexes');
         xlabel('time [s]');
-        ylabel('Amplitude');
+        ylabel('Amplitude [mV]');
         legend('Signal','T End');
     end
     % T_End_local = tEndLocal(signal,QRS_Onset,T_Max,T_End,Fs,type)
@@ -172,7 +172,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'ok');
     title(sprintf('Signal with QRS Complex and T End for patient %d file %s',patientNumber,fileName));
     xlabel('time [s]');
-    ylabel('Amplitude');
+    ylabel('Amplitude [mV]');
     legend('Signal filtered','R-Peak','QRS Onset','QRS End','T End');
     display('Saving figure to file');
     tic
