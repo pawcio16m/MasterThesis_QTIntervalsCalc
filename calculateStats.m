@@ -29,7 +29,7 @@ function [ Stats ] = calculateStats( QTinterval, fid, drainNumber)
     Stats(i).StandardDeviation = std(QTinterval);
     Stats(i).MinValue = min(QTinterval);
     Stats(i).MaxValue = max(QTinterval);
-    Stats(i).Percentage450 = length(find(QTinterval>450));
+    Stats(i).Percentage450 = ((length(find(QTinterval>450)))/length(QTinterval))*100;
     display(Stats);
 %         end        
     fprintf(fid,'--------------------------------------------\n');
