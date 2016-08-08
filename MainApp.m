@@ -28,12 +28,15 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     filepath = strcat('newptbdb/ptbdb/patient',sprintf('%03d',patientNumber));
     %choose first .dat file in the patient folder
     datFiles = dir(strcat(filepath,'/*.hea'));
+    Stats_out = {};
     for i=1:length(datFiles)
         filepath1 = strcat(filepath,'/',datFiles(i).name);
         display('-------------------------------------------------------------------------');
         display(sprintf('Load signal for patient %d, filename: %s from PTB database at Physionet.org',patientNumber,datFiles(i).name));
         [time,signal] = rdsamp(filepath1);   
-        [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(time,signal,patientNumber,datFiles(i).name,draw,formula);        
+        [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_temp] = QT_Interval(time,signal,patientNumber,datFiles(i).name,draw,formula); 
+        Stats_temp.filename = datFiles(i).name;
+        Stats_out{i} = Stats_temp;
     end
     display('-------------------------------------------------------------------------');
     display(' ');
