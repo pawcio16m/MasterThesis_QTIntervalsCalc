@@ -19,7 +19,10 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
     npointsToSlope = round(0.05*Fs);
     npointsToFit = round(npointsToSlope/2);
     T_End = zeros(1,length(T_Max));
-    xfit = zeros(1,npointsToFit);      
+    xfit = zeros(1,npointsToFit);   
+%     figure()
+%     plot(signal);
+%     hold on
     switch(type)
         case 'negative'
             disp('T wave negative');            
@@ -33,6 +36,9 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
                     for j=1:npointsToFit
                         xfit(j) = T_Max(i)+indexes(j);
                     end
+                    for k=-100:200
+                        xplot(k+101) = T_Max(i)+k;
+                    end
                     yfit = signal(xfit);
                     yfit = yfit';                       
                     Xfit = [ones(length(xfit),1), xfit'];
@@ -43,6 +49,8 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
                     end               
                     coeff = Xfit\yfit;
                     tend = round((baseline-coeff(1))/coeff(2))+indexes(1);
+                    yplot = coeff(2).*xfit + coeff(1);
+%                     plot(xplot,yplot);                    
                     if ((tend > T_Max(i)+ T_end_offset*Fs) || (tend < T_Max(i)) || (isnan(tend)))
                         T_End(i) = -1;       %wrong detection
                     else
@@ -62,6 +70,9 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
                     for j=1:npointsToFit
                         xfit(j) = T_Max(i)+indexes(j);
                     end
+                   for k=-100:200
+                        xplot(k+101) = T_Max(i)+k;
+                    end
                     yfit = signal(xfit);
                     yfit = yfit';                       
                     Xfit = [ones(length(xfit),1) xfit'];
@@ -72,6 +83,8 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
                     end   
                     coeff = Xfit\yfit;
                     tend = round((baseline-coeff(1))/coeff(2))+indexes(1);
+                    yplot = coeff(2).*xplot + coeff(1);
+%                     plot(xplot,yplot,'r'); 
                     if ((tend > T_Max(i)+ T_end_offset*Fs) || (tend < T_Max(i)) || (isnan(tend)))
                         T_End(i) = -1;       %wrong detection
                     else
@@ -82,6 +95,7 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
         otherwise 
             disp('Unknown method');       
     end
+%     plot(zeros(1,length(signal)),'y');
     TEndIndex = T_End;
 end
 

@@ -18,7 +18,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
 %   - Stats_out - struct with QT interval statistics
 
 
-    clc
+    %clc    
     close all
     
     display(sprintf('QT analysis program starts for patient %d\n',patientNumber));
