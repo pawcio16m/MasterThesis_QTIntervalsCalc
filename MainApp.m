@@ -28,7 +28,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     filepath = strcat('newptbdb/ptbdb/patient',sprintf('%03d',patientNumber));
     %choose first .dat file in the patient folder
     datFiles = dir(strcat(filepath,'/*.hea'));
-    Stats_out = {};
+    Stats_out = cell(1,length(datFiles));
     for i=1:length(datFiles)
         filepath1 = strcat(filepath,'/',datFiles(i).name);
         display('-------------------------------------------------------------------------');

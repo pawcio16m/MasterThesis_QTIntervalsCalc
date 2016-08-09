@@ -2,7 +2,8 @@ clear
 clc
 close all
 
-% delete('output/*');
+delete('output/*');
+
 fid = fopen('output/TestResults.txt','w+');
 fprintf(fid,'Filename  \t\t\t\t\t\t Median [ms] \n');
 count = 0;
@@ -10,7 +11,7 @@ patientFilter = [4,7,10,25,27,28,30,32,39,40,44,46,47,48,53,58,63,64,68,71,73,76
 display('Test starts...');
 display(' ');
 
-for i=1:2
+for i=1:152
     if(~ismember(i,patientFilter))
         patientNumber = i;
         count = count + 1;
@@ -25,7 +26,9 @@ for i=1:2
     end
 end
 
+display(' ');
 display(sprintf('There was %d records',count));
+fprintf(fid,sprintf('There was %d records',count));
 fclose(fid);
 display(' ');
 display('Test finished.');
