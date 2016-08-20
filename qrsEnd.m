@@ -1,5 +1,5 @@
-function [ qrsEndIndex] = qrsEnd( signal,R_Peak )
-%function [ qrsOnsetIndex , newR_Peak] = qrsEnd( signal,Fs,R_Peak )
+function [ qrsEndIndex] = qrsEnd( signal, R_Peak )
+%function [ qrsEndIndex] = qrsEnd( signal, R_Peak )
 %The function calculate QRS End index in filtered ECG signal
 %
 %Inputs:
@@ -8,9 +8,7 @@ function [ qrsEndIndex] = qrsEnd( signal,R_Peak )
 %
 %Outputs:
 %   - qrsEndIndex - matrix (1xN) with QRS End indexes
-%   Detailed explanation goes here
-%
-%  
+
   
     %QRS_End detection    
     qrsEndIndex = zeros(1,length(R_Peak));

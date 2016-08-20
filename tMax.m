@@ -52,10 +52,12 @@ function [ TMaxIndex, type] = tMax( signal, QRS_End, Fs )
         end
        
         %chceck if T wave pos or negative
-        if(signalCut(loc(1))>0)
-            counter_pos = counter_pos+1;
-        else
-            counter_neg = counter_neg+1;
+        if(~isempty(loc))            
+            if(signalCut(loc(1))>0)
+                counter_pos = counter_pos+1;
+            else
+                counter_neg = counter_neg+1;
+            end
         end
     end
     

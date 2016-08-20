@@ -41,7 +41,11 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
                     yfit = yfit';                       
                     Xfit = [ones(length(xfit),1), xfit'];
                     if (i==length(T_Max))
-                        baseline = median(signal(1,T_Max(i):T_Max(i)+round(0.3*Fs)));
+                        if(T_Max(i)+round(0.3*Fs)>length(signal))
+                            baseline = median(signal(1,T_Max(i):length(signal))); 
+                        else
+                            baseline = median(signal(1,T_Max(i):T_Max(i)+round(0.3*Fs))); 
+                        end
                     else
                         baseline = median(signal(1,T_Max(i):QRS_Onset(i+1)));
                     end               
@@ -73,9 +77,13 @@ function [ TEndIndex] = tEnd( signal, QRS_Onset, T_Max, Fs, type )
 %                     end
                     yfit = signal(xfit);
                     yfit = yfit';                       
-                    Xfit = [ones(length(xfit),1) xfit'];
+                    Xfit = [ones(length(xfit),1) xfit'];                  
                     if (i==length(T_Max))
-                        baseline = median(signal(1,T_Max(i):T_Max(i)+round(0.3*Fs)));     
+                        if(T_Max(i)+round(0.3*Fs)>length(signal))
+                            baseline = median(signal(1,T_Max(i):length(signal))); 
+                        else
+                            baseline = median(signal(1,T_Max(i):T_Max(i)+round(0.3*Fs))); 
+                        end                            
                     else
                         baseline = median(signal(1,T_Max(i):QRS_Onset(i+1)));
                     end   

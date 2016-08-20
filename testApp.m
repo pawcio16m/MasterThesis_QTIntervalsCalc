@@ -11,7 +11,7 @@ fid = fopen('output/TestResults.txt','w+');
 fprintf(fid,'Filename  \t\t\t\t\t\t Median [ms] \n');
 count = 0;
 %here we write patient number which we don't want to test
-patientFilter = [4,7,10,25,27,28,30,32,39,40,44,46,47,48,53,58,63,64,68,71,73,76,78,79,86,91,97,101,103,108,111,115,118,123,124,128,129,130,131,132,133,134,136,139,142,144,145,146,148,149,151,161];
+patientFilter = [124,132,134,161];
 display('Test starts...');
 display(' ');
 
