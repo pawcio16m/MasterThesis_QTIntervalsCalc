@@ -1,6 +1,8 @@
 function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(time, signal, patientNumber, fileName, draw, formula)
 %function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out, T_End_out, QT_Interval_out, Stats_out] = QT_Interval(time, signal, patientNumber, fileName, draw, formula)
-%The function execute whole program
+%
+%The function execute program QT interval detecion and analysis when the
+%input is matrix with time and signal
 %
 %Inputs:
 %   - time - signal duration
@@ -160,12 +162,11 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
         xlabel('time [s]');
         ylabel('Amplitude [mV]');
         legend('Signal','T End');
-    end
-    % T_End_local = tEndLocal(signal,QRS_Onset,T_Max,T_End,Fs,type)
+    end  
     toc    
 
 
-    %Draw all points on one plot
+    %Draw all points on one plot and save to file
     
     display('Draw a plot with all detected points');    
     fig = figure();
@@ -178,7 +179,6 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     tic
     saveas(fig,strcat('output\patient',sprintf('%03d',patientNumber),'_',fileName,'_plot.fig'));
     toc
-    
     
     
     %QT_calculation
@@ -198,24 +198,8 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     QT_Interval_statistic = calculateStats(QTinterval,fid,drainNumber);    
     toc   
     
-    
-    %draw signal from all drains
-    
-%     for i=1:12        
-%         signal = signal(:,i);
-%         signalFiltered = filtering(signalSample,filterOrder,Fc_Hp,Fc_Lp,Fs,draw);
-%         figure();
-%         plot(time,signalFiltered,'b',time(newR_Peak),signalFiltered(newR_Peak),'or',time(QRS_Onset),signalFiltered(QRS_Onset),'og',time(QRS_End),signalFiltered(QRS_End),'oy',time(T_End(T_End~=-1)),signalFiltered(T_End(T_End~=-1)),'ok');
-%         title('Signal with R peaks detection QRS Onset and QRS End');
-%         xlabel('time [s]');
-%         ylabel('Amplitude');
-%         legend('Signal filtered','R-Peak','QRS Onset','QRS End','T End');
-%         display('Saving figure to file');
-%     end
-        
-    
 
-    %end 
+    %Function end - create output and print function duration 
     
     signalFiltered_out = signalFiltered;
     R_index_out = newR_Peak;

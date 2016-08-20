@@ -1,6 +1,7 @@
-function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
-%function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
-%The function calculate QRS Onset index in filtered ECG signal
+function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal, Fs, R_Peak )
+%function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal, Fs, R_Peak )
+%The function calculate QRS Onset index in filtered ECG signal and corrects
+%R peak detection
 %
 %Inputs:
 %   - signal - filtered ECG signal
@@ -10,9 +11,7 @@ function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
 %Outputs:
 %   - qrsOnsetIndex - matrix (1xN) with QRS Onset indexes
 %   - newR_Peak - matrix (1xN) with new R Peak indexes
-%   Detailed explanation goes here
-%
-%  
+
   
     %QRS_Onset detection
     
@@ -31,7 +30,7 @@ function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
     %invert data to calculate local minima
     data = 1.01*max(signal) - signal;
     %calculate only important minima in 0.05Fs neighbourhood
-    [pks,loc] = findpeaks(data,'minpeakdistance',round(0.05*Fs));
+    [~,~] = findpeaks(data,'minpeakdistance',round(0.05*Fs));
     %go for each R Peak in signal
     for i=2:length(R_Peak)-1
         
@@ -71,13 +70,7 @@ function [ qrsOnsetIndex , newR_Peak] = qrsOnset( signal,Fs,R_Peak )
         end
         if(counterexceed == 0)
             qrs_onset = tempQRS;
-        end            
-                
-%         temp = find(loc<qrs_onset);
-%         %chcek if this minium is correct - not to far from calculated value
-%         if(qrs_onset - loc(temp(end)) > round(0.04*Fs))
-%             qrs_onset = loc(temp(end));
-%         end
+        end
         QRS_Onset(i-1) = qrs_onset;
     end
     qrsOnsetIndex = QRS_Onset;

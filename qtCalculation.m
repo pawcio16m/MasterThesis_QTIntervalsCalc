@@ -1,6 +1,6 @@
 function [ QT_Interval ] = qtCalculation( QRS_Onset, T_End, R_Peak, Fs, type )
 %function [ QT_Interval ] = qtCalculation( QRS_Onset, T_End, R_Peak, Fs, tpye )
-%The function calculate T wave end index in filtered ECG signal
+%The function calculate QT interval in filtered ECG signal
 %
 %Inputs:
 %   - QRS_Onset - matrix (1xN) with QRS Onset indexes
@@ -12,11 +12,9 @@ function [ QT_Interval ] = qtCalculation( QRS_Onset, T_End, R_Peak, Fs, type )
 %Outputs:
 %   - QT_Interval - matrix (1xN-1) with QT interval [ms] 
 %  
-%   Detailed explanation goes here
-%
-%  
-    QT_Interval = zeros(1,length(R_Peak));
 
+
+    QT_Interval = zeros(1,length(R_Peak));
     switch(type)
         case 'Bazetta'
             disp('Calculate QT interval according to Bazetta formula');

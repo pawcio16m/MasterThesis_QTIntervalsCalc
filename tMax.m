@@ -1,5 +1,5 @@
 function [ TMaxIndex, type] = tMax( signal, QRS_End, Fs )
-%function [ TMaxIndex, invert] = tMax( signal, QRS_Onsetm QRS_End, Fs )
+%function [ TMaxIndex, type] = tMax( signal, QRS_End, Fs )
 %The function calculate T wave max index in filtered ECG signal
 %
 %Inputs:
@@ -10,9 +10,7 @@ function [ TMaxIndex, type] = tMax( signal, QRS_End, Fs )
 %Outputs:
 %   - TMaxIndex - matrix (1xN) with T wave max indexes
 %   - type - a string that inform if T wave is positive or negative
-%   Detailed explanation goes here
-%
-%  
+
   
     warning('off','signal:findpeaks:noPeaks');
     %T wave max detection    
