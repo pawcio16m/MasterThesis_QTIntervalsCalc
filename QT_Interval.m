@@ -211,7 +211,7 @@ function [signalFiltered_out, R_index_out, QRS_Onset_out, QRS_End_out, T_Max_out
     Stats_out = QT_Interval_statistic;      
     telapsed = toc(tstart);
     display(sprintf('This analysis took %0.3f seconds',telapsed));
-    fprintf(fid,'This analysis wad done on %s and took %0.3f seconds\n\n',datestr(now),telapsed);
+    fprintf(fid,'This analysis was done on %s and took %0.3f seconds\n\n',datestr(now),telapsed);
     fclose(fid);
 
 end

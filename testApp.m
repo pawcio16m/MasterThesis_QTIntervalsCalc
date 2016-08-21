@@ -15,7 +15,7 @@ patientFilter = [124,132,134,161];
 display('Test starts...');
 display(' ');
 
-for i=1:152
+for i=1:294
     if(~ismember(i,patientFilter))
         patientNumber = i;
         count = count + 1;

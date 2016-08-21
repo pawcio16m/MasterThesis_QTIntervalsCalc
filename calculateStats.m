@@ -40,7 +40,7 @@ function [ Stats ] = calculateStats( QTinterval, fid, drainNumber)
     fprintf(fid,'StandardDeviation:\t %0.2f\t[ms]\n', Stats(i).StandardDeviation);
     fprintf(fid,'MinValue:\t\t\t %0.2f\t[ms]\n', Stats(i).MinValue);
     fprintf(fid,'MaxValue:\t\t\t %0.2f\t[ms]\n', Stats(i).MaxValue);
-    fprintf(fid,'PercentageAbove450:\t\t %0.2f \t[%]\n', Stats(i).Percentage450);
+    fprintf(fid,'Above450:\t\t\t %0.2f \t[%%]\n', Stats(i).Percentage450);
      
 %     end
     fprintf(fid,'--------------------------------------------\n\n');
